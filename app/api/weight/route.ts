@@ -1,7 +1,30 @@
+import { desc } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
 import { db } from "@/db";
 import { weightEntries } from "@/db/schema/weight";
+
+export async function GET() {
+  try {
+    const entries = await db
+      .select({
+        id: weightEntries.id,
+        weightKg: weightEntries.weightKg,
+        recordedAt: weightEntries.recordedAt,
+      })
+      .from(weightEntries)
+      .orderBy(desc(weightEntries.recordedAt));
+
+    return NextResponse.json(entries);
+  } catch (error) {
+    console.error("Failed to fetch weight history:", error);
+
+    return NextResponse.json(
+      { error: "Failed to fetch weight history" },
+      { status: 500 },
+    );
+  }
+}
 
 export async function POST(request: Request) {
   try {

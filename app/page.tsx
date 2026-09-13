@@ -1,21 +1,40 @@
+"use client";
+
+import { useState } from "react";
+
+import SideNav from "@/components/ui/SideNav";
 import WeightTile from "@/components/weight/WeightTile";
 
 export default function Home() {
+  const [navOpen, setNavOpen] = useState(false);
+
   return (
-    <main className="min-h-screen bg-gray-50 px-6 py-10">
-      <div className="mx-auto max-w-5xl">
-        <h1 className="text-3xl font-bold text-gray-900">
-          Daily
-        </h1>
+    <>
+      <main className="min-h-screen bg-gray-50 px-5 py-6">
+        <header className="mb-8 flex items-center justify-between">
+          <h1 className="text-2xl font-semibold tracking-tight text-gray-900">
+            Daily
+          </h1>
 
-        <p className="mt-2 text-gray-500">
-          Keep track of the things that matter.
-        </p>
+          <button
+            type="button"
+            onClick={() => setNavOpen(true)}
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full text-gray-700 transition hover:bg-gray-200"
+            aria-label="Open menu"
+          >
+            <span className="text-2xl leading-none">☰</span>
+          </button>
+        </header>
 
-        <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-2 gap-4">
           <WeightTile />
         </div>
-      </div>
-    </main>
+      </main>
+
+      <SideNav
+        open={navOpen}
+        onClose={() => setNavOpen(false)}
+      />
+    </>
   );
 }
