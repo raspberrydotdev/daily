@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+import WeightChart from "./WeightChart";
+
 type WeightEntry = {
   id: number;
   weightKg: string;
@@ -61,25 +63,29 @@ export default function WeightHistory() {
   }
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white">
-      {entries.map((entry, index) => (
-        <div
-          key={entry.id}
-          className={`flex items-center justify-between px-5 py-4 ${
-            index !== entries.length - 1
-              ? "border-b border-gray-100"
-              : ""
-          }`}
-        >
-          <span className="text-sm text-gray-500">
-            {formatDate(entry.recordedAt)}
-          </span>
+    <div className="space-y-4">
+      <WeightChart entries={entries} />
 
-          <span className="font-semibold text-gray-900">
-            {entry.weightKg} kg
-          </span>
-        </div>
-      ))}
+      <div className="overflow-hidden rounded-3xl border border-gray-200 bg-white">
+        {entries.map((entry, index) => (
+          <div
+            key={entry.id}
+            className={`flex items-center justify-between px-5 py-4 ${
+              index !== entries.length - 1
+                ? "border-b border-gray-100"
+                : ""
+            }`}
+          >
+            <span className="text-sm text-gray-500">
+              {formatDate(entry.recordedAt)}
+            </span>
+
+            <span className="font-semibold text-gray-900">
+              {entry.weightKg} kg
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

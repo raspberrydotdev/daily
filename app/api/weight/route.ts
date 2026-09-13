@@ -5,82 +5,86 @@ import { db } from "@/db";
 import { weightEntries } from "@/db/schema/weight";
 
 export async function GET() {
-  try {
-    const entries = await db
-      .select({
-        id: weightEntries.id,
-        weightKg: weightEntries.weightKg,
-        recordedAt: weightEntries.recordedAt,
-      })
-      .from(weightEntries)
-      .orderBy(desc(weightEntries.recordedAt));
+try {
+const entries = await db
+.select()
+.from(weightEntries)
+.orderBy(desc(weightEntries.recordedAt));
 
-    return NextResponse.json(entries);
-  } catch (error) {
-    console.error("Failed to fetch weight history:", error);
+return NextResponse.json(entries);
 
-    return NextResponse.json(
-      { error: "Failed to fetch weight history" },
-      { status: 500 },
-    );
-  }
+
+} catch (error) {
+console.error("Failed to fetch weight entries:", error);
+
+return NextResponse.json(
+  { error: "Failed to fetch weight entries" },
+  { status: 500 },
+);
+
+
+}
 }
 
 export async function POST(request: Request) {
-  try {
-    const body = await request.json();
+try {
+const body = await request.json();
 
-    const weightKg = Number(body.weightKg);
-    const date = String(body.date);
+const weightKg = Number(body.weightKg);
+const date = String(body.date);
 
-    if (
-      !Number.isFinite(weightKg) ||
-      weightKg <= 0 ||
-      weightKg > 500
-    ) {
-      return NextResponse.json(
-        { error: "Invalid weight" },
-        { status: 400 },
-      );
-    }
+if (
+  !Number.isFinite(weightKg) ||
+  weightKg <= 0 ||
+  weightKg > 500
+) {
+  return NextResponse.json(
+    { error: "Invalid weight" },
+    { status: 400 },
+  );
+}
 
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      return NextResponse.json(
-        { error: "Invalid date" },
-        { status: 400 },
-      );
-    }
+if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+  return NextResponse.json(
+    { error: "Invalid date" },
+    { status: 400 },
+  );
+}
 
-    const now = new Date();
+const now = new Date();
 
-    const recordedAt = new Date(
-      `${date}T${String(now.getHours()).padStart(2, "0")}:${String(
-        now.getMinutes(),
-      ).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`,
-    );
+const recordedAt = new Date(
+  `${date}T${String(now.getHours()).padStart(2, "0")}:${String(
+    now.getMinutes(),
+  ).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`,
+);
 
-    if (Number.isNaN(recordedAt.getTime())) {
-      return NextResponse.json(
-        { error: "Invalid date" },
-        { status: 400 },
-      );
-    }
+if (Number.isNaN(recordedAt.getTime())) {
+  return NextResponse.json(
+    { error: "Invalid date" },
+    { status: 400 },
+  );
+}
 
-    const [entry] = await db
-      .insert(weightEntries)
-      .values({
-        weightKg: weightKg.toFixed(2),
-        recordedAt,
-      })
-      .returning();
+const [entry] = await db
+  .insert(weightEntries)
+  .values({
+    weightKg: weightKg.toFixed(2),
+    recordedAt,
+  })
+  .returning();
 
-    return NextResponse.json(entry, { status: 201 });
-  } catch (error) {
-    console.error("Failed to create weight entry:", error);
+return NextResponse.json(entry, { status: 201 });
 
-    return NextResponse.json(
-      { error: "Failed to create weight entry" },
-      { status: 500 },
-    );
-  }
+
+} catch (error) {
+console.error("Failed to create weight entry:", error);
+
+return NextResponse.json(
+  { error: "Failed to create weight entry" },
+  { status: 500 },
+);
+
+
+}
 }
