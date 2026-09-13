@@ -1,0 +1,45 @@
+name: daily
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: daily-web
+    working_dir: /app
+    volumes:
+      - .:/app
+      - daily_node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://daily:daily@db:5432/daily
+    depends_on:
+      db:
+        condition: service_healthy
+    command: npm run dev
+    stdin_open: true
+    tty: true
+
+  db:
+    image: postgres:17-alpine
+    container_name: daily-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: daily
+      POSTGRES_PASSWORD: daily
+      POSTGRES_DB: daily
+    ports:
+      - "5432:5432"
+    volumes:
+      - daily_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U daily -d daily"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  daily_node_modules:
+  daily_postgres_data:
